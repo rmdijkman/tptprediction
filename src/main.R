@@ -1,5 +1,6 @@
 library(sqldf)
 library(Metrics)
+library(rpart)
 
 source("src/timefunctions.R")
 source("src/errorfunctions.R")
@@ -39,7 +40,11 @@ medianerror <- median(cases$error)
 cases$iseasy = (cases$error < medianerror)
 
 #split mean TPT easy/mean TPT hard
+meantime.easy = mean(cases[cases$iseasy==TRUE,]$difftime)
+meantime.hard = mean(cases[cases$iseasy==FALSE,]$difftime)
 
 #predict iseasy
+fit <- rpart(iseasy ~ amount + article + points + vehicleclass, method="class", data=cases)
+pfit<- prune(fit, cp=fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
 
 #predict mean TPT easy/mean TPT hard
