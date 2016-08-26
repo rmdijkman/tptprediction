@@ -1,6 +1,7 @@
 library(sqldf)
 library(Metrics)
 library(rpart)
+library(caret)
 
 source("src/timefunctions.R")
 source("src/errorfunctions.R")
@@ -24,8 +25,9 @@ cases <- sqldf('SELECT `Case.ID` AS caseid,
 
 #Simple prediction, just using the mean TPT
 meantime <- mean(cases$difftime)
-
 cases$prediction <- meantime
+
+#Compute the error
 cases$error <- abs(cases$difftime - cases$prediction)
 prediction.simple.mae <- mae(cases$difftime, cases$prediction)
 prediction.simple.rmse <- rmse(cases$difftime, cases$prediction)
@@ -44,7 +46,24 @@ meantime.easy = mean(cases[cases$iseasy==TRUE,]$difftime)
 meantime.hard = mean(cases[cases$iseasy==FALSE,]$difftime)
 
 #predict iseasy
-fit <- rpart(iseasy ~ amount + article + points + vehicleclass, method="class", data=cases)
+fit <- rpart(iseasy ~ resources + amount + article + points + vehicleclass, method="class", data=cases)
 pfit<- prune(fit, cp=fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
 
 #predict mean TPT easy/mean TPT hard
+cases$predictediseasy = predict(pfit,cases,type="class")
+cases$predictionsplit <- mapply(function(x){
+                            if (x == TRUE){
+                              return(meantime.easy)
+                            }else{
+                              return(meantime.hard)
+                            }
+                          }, cases$predictediseasy)
+
+#compute the error
+prediction.split.smape <- smape(cases$difftime, cases$predictionsplit)
+prediction.split.smape.easy <- smape(cases[cases$predictediseasy==TRUE,]$difftime, cases[cases$predictediseasy==TRUE,]$predictionsplit)
+prediction.split.smape.hard <- smape(cases[cases$predictediseasy==FALSE,]$difftime, cases[cases$predictediseasy==FALSE,]$predictionsplit)
+
+folds <- createFolds(cases$difftime, 10)
+cases.train <- cases[-folds[[1]],]
+cases.test <- cases[folds[[1]],]
