@@ -2,6 +2,7 @@ library(sqldf)
 library(Metrics)
 library(rpart)
 library(caret)
+library(dplyr)
 
 source("src/timefunctions.R")
 source("src/errorfunctions.R")
@@ -22,6 +23,17 @@ cases <- sqldf('SELECT `Case.ID` AS caseid,
                     MIN(`Complete.Timestamp`) AS mintime, 
                     MAX(`Complete.Timestamp`) AS maxtime, 
                     MAX(`Complete.Timestamp`) - MIN(`Complete.Timestamp`) AS difftime FROM data GROUP BY `Case.ID`')
+
+folds <- createFolds(cases$difftime, 10)
+
+
+
+cases.train <- cases[-folds[[1]],]
+cases.test <- cases[folds[[1]],]
+
+testfunction <- function(x,y) {return(x)}
+
+mutate(cases.train, test = testfunction(resources,article))
 
 #Simple prediction, just using the mean TPT
 meantime <- mean(cases$difftime)
@@ -63,7 +75,3 @@ cases$predictionsplit <- mapply(function(x){
 prediction.split.smape <- smape(cases$difftime, cases$predictionsplit)
 prediction.split.smape.easy <- smape(cases[cases$predictediseasy==TRUE,]$difftime, cases[cases$predictediseasy==TRUE,]$predictionsplit)
 prediction.split.smape.hard <- smape(cases[cases$predictediseasy==FALSE,]$difftime, cases[cases$predictediseasy==FALSE,]$predictionsplit)
-
-folds <- createFolds(cases$difftime, 10)
-cases.train <- cases[-folds[[1]],]
-cases.test <- cases[folds[[1]],]
