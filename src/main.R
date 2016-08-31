@@ -27,6 +27,7 @@ cases <- sqldf('SELECT
                     MAX(`Complete.Timestamp`) - MIN(`Complete.Timestamp`) AS proctime 
                 FROM data GROUP BY `Case.ID`')
 cases$amount = as.numeric(cases$amount)
+cases$points = as.numeric(cases$points)
 #The relation that must be learned to predict the class of a case (Easy, Hard, ...)
 relation = class ~ amount + article + points + vehicleclass
 
