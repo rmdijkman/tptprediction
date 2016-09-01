@@ -3,6 +3,7 @@ library(Metrics)
 library(rpart)
 library(caret)
 library(dplyr)
+library(lubridate)
 
 source("src/timefunctions.R")
 source("src/errorfunctions.R")
@@ -28,8 +29,10 @@ cases <- sqldf('SELECT
                 FROM data GROUP BY `Case.ID`')
 cases$amount = as.numeric(cases$amount)
 cases$points = as.numeric(cases$points)
+cases$month = as.numeric(month(as.POSIXlt(cases$starttime, origin="1970-01-01", tz = "GMT")))
+cases$day = as.numeric(day(as.POSIXlt(cases$starttime, origin="1970-01-01", tz = "GMT")))
 #The relation that must be learned to predict the class of a case (Easy, Hard, ...)
-relation = class ~ amount + article + points + vehicleclass
+relation = class ~ amount + article + points + vehicleclass + month + day
 
 ################################################################################
 #
@@ -118,6 +121,7 @@ classes = unique(cases$class)
 
 folds <- createFolds(cases$proctime, k)
 
+acc.avg = 0
 mae.avg = 0
 rmse.avg = 0
 smape.avg = 0
@@ -133,6 +137,8 @@ for (i in 1:k){
   
   cases.test = f.predictclass(cases.test, model.class)
   cases.test = f.predictproctime(cases.test, modelvector.proctime)
+
+  acc.avg = acc.avg + (sum(cases.test$class == cases.test$predictedclass)/length(cases.test$class))
   
   mae.avg = mae.avg + mae(cases.test$proctime, cases.test$predictedproctime)
   rmse.avg = rmse.avg + rmse(cases.test$proctime, cases.test$predictedproctime)
@@ -142,6 +148,7 @@ for (i in 1:k){
   }
 }
 
+acc.avg = acc.avg/k
 mae.avg = mae.avg/k
 rmse.avg = rmse.avg/k
 smape.avg = smape.avg/k
@@ -149,7 +156,10 @@ for (class in classes){
   smape.avg.byclass[[class]] = smape.avg.byclass[[class]]/k
 }
 
-print(mae.avg)
-print(rmse.avg)
-print(smape.avg)
-print(smape.avg.byclass)
+cat("Number of cases: ", length(cases), "\n")
+cat("Average processing time: ", mean(cases$proctime), "\n")
+cat("Accuracy of class prediction: ", acc.avg, "\n")
+cat("MAE of processing time prediction (s): ", mae.avg, "\n")
+cat("RMSE of processing time prediction (s): ", rmse.avg, "\n")
+cat("SMAPE of processing time prediction (%): ", smape.avg, "\n")
+cat("SMAPE of processing time prediction per class (%): ", smape.avg.byclass, "(", names(smape.avg.byclass), ")\n")
