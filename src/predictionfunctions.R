@@ -85,7 +85,7 @@ f.learnproctime.regression <- function(cases.subset, relation){
   predictionfunctions = vector(mode = "list", length = length(classes))
   names(predictionfunctions) = classes
   for (class in classes){
-    f = lm(proctime.relation.1, data=cases.subset)
+    f = lm(relation, data=cases.subset)
     predictionfunctions[[class]] = function(row){return(predict(f,row))}
   }
   return(predictionfunctions)

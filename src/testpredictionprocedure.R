@@ -1,9 +1,9 @@
-cases = cases.1
-class.relation = class.relation.1
-proctime.relation = proctime.relation.1
+cases = cases.4
+class.relation = class.relation.4
+proctime.relation = proctime.relation.4
 f.addclass = f.addclass.eh
 f.learnclass = f.learnclass.dectree
-f.learnproctime = f.learnproctime.regression
+f.learnproctime = f.learnproctime.mean
 f.predictclass = f.predictclass.dectree
 
 k = 10

@@ -1,0 +1,17 @@
+Data is obtained from the following sources.
+
+1:
+BPI Challenge 2015
+http://dx.doi.org/10.4121/uuid:31a308ef-c844-48da-948c-305d167a0ec1
+
+2: 
+BPI Challenge 2012
+http://dx.doi.org/10.4121/uuid:3926db30-f712-4394-aebc-75976070e91f
+
+3: 
+BPI Challenge 2013
+http://dx.doi.org/10.4121/uuid:a7ce5c55-03a7-4583-b855-98b86e1a2b07
+
+4:
+Receipt phase of an environmental permit application process (‘WABO’), CoSeLoG project
+http://dx.doi.org/10.4121/uuid:a07386a5-7be3-4367-9535-70bc9e77dbe6

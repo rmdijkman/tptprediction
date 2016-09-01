@@ -26,6 +26,7 @@ compute.proctime <- function(cases, class.relation, proctime.relation, f.addclas
   for (i in 1:k){
     cases.train <- cases[-folds[[i]],]
     cases.test <- cases[folds[[i]],]
+    cases.test = cases.test[cases.test$prefix %in% intersect(unique(cases.test$prefix), unique(cases.train$prefix)),]
     
     model.class = f.learnclass(cases.train, class.relation)
     modelvector.proctime = f.learnproctime(cases.train, proctime.relation)
