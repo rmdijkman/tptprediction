@@ -29,11 +29,24 @@ cases.1 <- sqldf('SELECT
                     MAX(`Complete.Timestamp`) AS endtime, 
                     MAX(`Complete.Timestamp`) - MIN(`Complete.Timestamp`) AS proctime 
                 FROM `data.1` GROUP BY `Case.ID`')
+cases.1$amount[is.na(cases.1$amount)] = 0
 cases.1$amount = as.numeric(cases.1$amount)
 cases.1$points = as.numeric(cases.1$points)
 cases.1$month = as.numeric(month(as.POSIXlt(cases.1$starttime, origin="1970-01-01", tz = "GMT")))
 cases.1$day = as.numeric(day(as.POSIXlt(cases.1$starttime, origin="1970-01-01", tz = "GMT")))
 #The relation that must be learned to predict the class of a case (Easy, Hard, ...)
-relation.1 = class ~ amount + article + points + vehicleclass + month + day
+class.relation.1 = class ~ amount + article + points + vehicleclass + month + day
+proctime.relation.1 = proctime ~ amount + points + month + day
 
-compute.proctime(cases.1, relation.1, f.addclass.eh, f.learnclass.dectree, f.learnproctime.mean, f.predictclass.dectree, f.predictproctime)
+compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
+                 f.addclass.eh, 
+                 f.learnclass.dectree, 
+                 f.learnproctime.mean, 
+                 f.predictclass.dectree, 
+                 f.predictproctime)
+compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
+                 f.addclass.eh, 
+                 f.learnclass.dectree, 
+                 f.learnproctime.regression, 
+                 f.predictclass.dectree, 
+                 f.predictproctime)

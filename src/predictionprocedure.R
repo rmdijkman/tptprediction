@@ -6,7 +6,7 @@
 #
 ################################################################################
 
-compute.proctime <- function(cases, class.relation, f.addclass, f.learnclass, f.learnproctime, f.predictclass, f.predictproctime){
+compute.proctime <- function(cases, class.relation, proctime.relation, f.addclass, f.learnclass, f.learnproctime, f.predictclass, f.predictproctime){
   k = 10
   
   cases = f.addclass(cases)
@@ -28,7 +28,7 @@ compute.proctime <- function(cases, class.relation, f.addclass, f.learnclass, f.
     cases.test <- cases[folds[[i]],]
     
     model.class = f.learnclass(cases.train, class.relation)
-    modelvector.proctime = f.learnproctime(cases.train)
+    modelvector.proctime = f.learnproctime(cases.train, proctime.relation)
     
     cases.test = f.predictclass(cases.test, model.class)
     cases.test = f.predictproctime(cases.test, modelvector.proctime)
