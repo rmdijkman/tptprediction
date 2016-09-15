@@ -168,6 +168,6 @@ compute.proctime(cases.2, class.relation.2, proctime.relation.2,
 compute.proctime(cases.3, class.relation.3, proctime.relation.3, 
                  f.addclass.eh, 
                  f.learnclass.dectree, 
-                 f.learnproctime.regression, 
+                 f.learnproctime.regressiontree, 
                  f.predictclass.dectree, 
                  f.predictproctime)
