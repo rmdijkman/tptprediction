@@ -104,7 +104,7 @@ cases.3$day = as.numeric(day(as.POSIXlt(cases.3$starttime, origin="1970-01-01", 
 #The relation that must be learned to predict the class of a case (Easy, Hard, ...)
 cases.3$prefix = sapply(cases.3$activities, function(x) activityListPrefix(x,1))
 class.relation.3 = class ~ impact + orgrole + month + day + prefix
-proctime.relation.3 = proctime ~ month + day
+proctime.relation.3 = proctime ~ month + day + prefix
 
 ################################################################################
 #
@@ -159,15 +159,20 @@ proctime.relation.4 = proctime ~ leges + month + day + prefix
 #
 ################################################################################
 
-compute.proctime(cases.2, class.relation.2, proctime.relation.2, 
-                 f.addclass.eh, 
-                 f.learnclass.dectree, 
-                 f.learnproctime.mean, 
-                 f.predictclass.dectree, 
-                 f.predictproctime)
-compute.proctime(cases.3, class.relation.3, proctime.relation.3, 
-                 f.addclass.eh, 
-                 f.learnclass.dectree, 
+compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
+                 f.addclass.noclass,
+                 f.learnclass.noclass, 
                  f.learnproctime.regressiontree, 
-                 f.predictclass.dectree, 
+                 f.predictclass.noclass, 
                  f.predictproctime)
+
+################################################################################
+#
+# Histograms of Processing Times
+#
+################################################################################
+#
+#hist(cases.1$proctime/(60*60*24),breaks=200,xlab="Processing Time (days)",main="Histogram of Processing Time Case 1",xlim=c(0,1500))
+#hist(cases.2$proctime/(60*60*24),breaks=200,xlab="Processing Time (days)",main="Histogram of Processing Time Case 2",xlim=c(0,40))
+#hist(cases.3$proctime/(60*60*24),breaks=200,xlab="Processing Time (days)",main="Histogram of Processing Time Case 3",xlim=c(0,150))
+#hist(cases.4$proctime/(60*60*24),breaks=200,xlab="Processing Time (days)",main="Histogram of Processing Time Case 4",xlim=c(0,400))

@@ -1,6 +1,6 @@
-cases = cases.4
-class.relation = class.relation.4
-proctime.relation = proctime.relation.4
+cases = cases.1
+class.relation = class.relation.1
+proctime.relation = proctime.relation.1
 f.addclass = f.addclass.eh
 f.learnclass = f.learnclass.dectree
 f.learnproctime = f.learnproctime.mean
@@ -22,7 +22,7 @@ smape.avg = 0
 smape.avg.byclass = vector(mode = "numeric", length = length(classes))
 names(smape.avg.byclass) = classes
 
-i = 1
+i = 10
 cases.train <- cases[-folds[[i]],]
 cases.test <- cases[folds[[i]],]
 
