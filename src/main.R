@@ -160,10 +160,10 @@ proctime.relation.4 = proctime ~ leges + month + day + prefix
 ################################################################################
 
 compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
-                 f.addclass.noclass,
-                 f.learnclass.noclass, 
+                 f.addclass.prop1,
+                 f.learnclass.dectree, 
                  f.learnproctime.regressiontree, 
-                 f.predictclass.noclass, 
+                 f.predictclass.dectree, 
                  f.predictproctime)
 
 ################################################################################

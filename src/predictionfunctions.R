@@ -53,6 +53,36 @@ f.addclass.eh <- function(cases.subset){
 
 ################################################################################
 #
+# attaching the actual class of a case
+# this is proprietary for case 1
+# classes are assigned based on visual inspection of the processing time histogram:
+# - ZeroEasy: 0 processing time
+# - ZeroHard: 0 < processing time <= 30.000.000
+# - NormalEasy: the 50% easy to predict cases with processing time > 30.000.000
+# - NormalHard: the 50% hard to predict cases with processing time > 30.000.000
+#
+################################################################################
+
+f.addclass.prop1  <- function(cases.subset){
+  mean.proctime <- mean(cases.1[cases.1$proctime > 30000000,]$proctime)
+  median.error <- median(abs(cases.1[cases.1$proctime > 30000000,]$proctime - mean.proctime))
+  f.class <- function(proctimevalue){
+    if (proctimevalue == 0){
+      return("ZeroEasy")
+    }else if ((proctimevalue > 0)&&(proctimevalue <= 30000000)){
+      return("ZeroHard")
+    }else if ((proctimevalue > 30000000) && abs(proctimevalue-mean.proctime) < median.error){
+      return("NormalEasy")
+    }else{
+      return("NormalHard")
+    }
+  }
+  cases.subset$class = mapply(f.class,cases.subset$proctime)
+  return(cases.subset)
+}
+
+################################################################################
+#
 # learning the class of a case based on other variables
 # learned model is a decision tree
 # the model that is learned is defined in the 'relation'
