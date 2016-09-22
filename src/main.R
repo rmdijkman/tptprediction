@@ -4,6 +4,7 @@ library(rpart)
 library(caret)
 library(dplyr)
 library(lubridate)
+library(fpc)
 
 source("src/utilfunctions.R")
 source("src/errorfunctions.R")
@@ -156,11 +157,13 @@ proctime.relation.4 = proctime ~ leges + month + day + prefix
 #
 # TODO: 
 #   - Use a step number and time passed to predict processing time
+#   - Add the number of elements in each class to the reported numbers
+#   - Add automatic computation of cluster means instead of proprietary computation
 #
 ################################################################################
 
 compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
-                 f.addclass.prop1,
+                 f.addclass.clusters1,
                  f.learnclass.dectree, 
                  f.learnproctime.regressiontree, 
                  f.predictclass.dectree, 

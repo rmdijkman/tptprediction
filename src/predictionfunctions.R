@@ -55,6 +55,69 @@ f.addclass.eh <- function(cases.subset){
 #
 # attaching the actual class of a case
 # this is proprietary for case 1
+# classes are based on an array of averages (that can be determined by clustering)
+# a case belongs to the class with the closest average proctime
+# return set with additional column 'class'
+#
+################################################################################
+
+f.addclass.clusters1 <- function(cases.subset){
+  means = c(5884891,59129320)
+  f.class <- function(proctimevalue){
+    closest = means[1]
+    for (i in means){
+      if (abs(i-proctimevalue) < abs(closest-proctimevalue)){
+        closest = i
+      }
+    }
+    return(paste0("c",closest))
+  }
+  cases.subset$class = mapply(f.class,cases.subset$proctime)
+  return(cases.subset)
+}
+
+################################################################################
+#
+# attaching the actual class of a case
+# this is proprietary for case 1
+# classes are based on an array of averages (that can be determined by clustering)
+# a case belongs to the class with the closest average proctime
+# but a distinction is made between the 50% closest to the average (the easy category)
+# and the 50% furthest from the average (the hard category)
+# return set with additional column 'class'
+#
+################################################################################
+
+f.addclass.clusterseh1 <- function(cases.subset){
+  means = c(5884891,59129320)
+  f.class <- function(proctimevalue){
+    closest = means[1]
+    for (i in means){
+      if (abs(i-proctimevalue) < abs(closest-proctimevalue)){
+        closest = i
+      }
+    }
+    return(closest)
+  }
+  cases.subset$class = mapply(f.class,cases.subset$proctime)
+  for (i in means){
+    median.error <- median(abs(cases.subset[cases.subset$class==i,]$proctime - i))
+    f.class.eh <- function(proctimevalue){
+      if (abs(proctimevalue-i) < median.error){
+        return(paste0("E",i))
+      }else{
+        return(paste0("H",i))
+      }
+    }
+    cases.subset[cases.subset$class==i,]$class = mapply(f.class.eh,cases.subset[cases.subset$class==i,]$proctime)
+  }
+  return(cases.subset)
+}
+
+################################################################################
+#
+# attaching the actual class of a case
+# this is proprietary for case 1
 # classes are assigned based on visual inspection of the processing time histogram:
 # - ZeroEasy: 0 processing time
 # - ZeroHard: 0 < processing time <= 30.000.000
