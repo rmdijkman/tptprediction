@@ -12,6 +12,26 @@
 
 ################################################################################
 #
+# Internal function that computes the clusters that exist in the processing times
+# and returns the average proctime for each cluster
+# return a vector with cluster averages
+#
+################################################################################
+
+f.clusters <- function(cases.subset){
+  proctimes = cases.subset$proctime
+  
+  proctimessample = sample(proctimes, 1000)
+  
+  k = pamk(proctimessample)$nc
+  
+  fit <- kmeans(proctimes, k)
+  
+  return(aggregate(proctimes,by=list(fit$cluster),FUN=mean)$x)
+}
+
+################################################################################
+#
 # not classifying the cases by simply labeling them all with 'noclass'
 # return set with additional column 'class'
 #
@@ -54,15 +74,14 @@ f.addclass.eh <- function(cases.subset){
 ################################################################################
 #
 # attaching the actual class of a case
-# this is proprietary for case 1
 # classes are based on an array of averages (that can be determined by clustering)
 # a case belongs to the class with the closest average proctime
 # return set with additional column 'class'
 #
 ################################################################################
 
-f.addclass.clusters1 <- function(cases.subset){
-  means = c(5884891,59129320)
+f.addclass.clusters <- function(cases.subset){
+  means = f.clusters(cases.subset)
   f.class <- function(proctimevalue){
     closest = means[1]
     for (i in means){
@@ -88,8 +107,8 @@ f.addclass.clusters1 <- function(cases.subset){
 #
 ################################################################################
 
-f.addclass.clusterseh1 <- function(cases.subset){
-  means = c(5884891,59129320)
+f.addclass.clusterseh <- function(cases.subset){
+  means = f.clusters(cases.subset)
   f.class <- function(proctimevalue){
     closest = means[1]
     for (i in means){
