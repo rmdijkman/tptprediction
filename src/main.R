@@ -157,15 +157,11 @@ proctime.relation.4 = proctime ~ leges + month + day + prefix
 #
 # TODO: 
 #   - Use a step number and time passed to predict processing time
-#   - Also report the number of elements in each class
-#   - The number of clusters is not stable (due to sampling?), it is better to:
-#     calculate the optimal number of clusters 10 times and take the most frequently occurring number of clusters
-#     do this separately for each case, because this is quite computation intensive
 #
 ################################################################################
 
 compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
-                 f.addclass.clusters,
+                 f.addclass.eh,
                  f.learnclass.dectree, 
                  f.learnproctime.regressiontree, 
                  f.predictclass.dectree, 

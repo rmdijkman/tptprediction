@@ -21,10 +21,16 @@
 f.clusters <- function(cases.subset){
   proctimes = cases.subset$proctime
   
-  proctimessample = sample(proctimes, 1000)
+  ks = c()
   
-  k = pamk(proctimessample)$nc
+  for (i in c(1:10)){
+    proctimessample = sample(proctimes, 1000)
+    k = pamk(proctimessample)$nc
+    ks = append(ks, k)
+  }
   
+  k = names(sort(table(ks),decreasing=TRUE))[1]
+
   fit <- kmeans(proctimes, k)
   
   return(aggregate(proctimes,by=list(fit$cluster),FUN=mean)$x)

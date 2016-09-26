@@ -23,6 +23,9 @@ compute.proctime <- function(cases, class.relation, proctime.relation, f.addclas
   smape.avg.byclass = vector(mode = "numeric", length = length(classes))
   names(smape.avg.byclass) = classes
   
+  cases.test.class = c()
+  cases.test.predictedclass = c()
+  
   for (i in 1:k){
     cases.train <- cases[-folds[[i]],]
     cases.test <- cases[folds[[i]],]
@@ -35,6 +38,8 @@ compute.proctime <- function(cases, class.relation, proctime.relation, f.addclas
     
     cases.test = f.predictclass(cases.test, model.class)
     cases.test = f.predictproctime(cases.test, modelvector.proctime)
+    cases.test.class = append(cases.test.class, cases.test$class)
+    cases.test.predictedclass = append(cases.test.predictedclass, as.character(cases.test$predictedclass))
     
     threshold.95 = sort(cases.test$proctime - cases.test$predictedproctime)[0.95*as.numeric(count(cases.test))]
     threshold.80 = sort(cases.test$proctime - cases.test$predictedproctime)[0.80*as.numeric(count(cases.test))]
@@ -63,8 +68,10 @@ compute.proctime <- function(cases, class.relation, proctime.relation, f.addclas
   }
   
   cat("Number of cases: ", as.numeric(count(cases)), "\n")
-  cat("Average processing time: ", mean(cases$proctime), "\n")
+  cat("Average processing time (s): ", mean(cases$proctime), "\n")
   cat("Accuracy of class prediction: ", acc.avg, "\n")
+  cat("Confusion matrix of class prediction:\n")
+  print(confusionMatrix(cases.test.predictedclass, cases.test.class)$table)
   cat("MAE of processing time prediction (s): ", mae.avg, "\n")
   cat("MAE with 95% on time prediction (s): ", mae.avg.95, "\n")
   cat("MAE with 80% on time prediction (s): ", mae.avg.80, "\n")
