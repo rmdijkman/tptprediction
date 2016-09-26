@@ -34,6 +34,7 @@ cases.1 <- sqldf('SELECT
                     GROUP_CONCAT(totalPaymentAmount) AS total,
                     MIN(`Complete.Timestamp`) AS starttime, 
                     MAX(`Complete.Timestamp`) AS endtime, 
+                    GROUP_CONCAT(`Complete.Timestamp`) AS completiontimes,
                     MAX(`Complete.Timestamp`) - MIN(`Complete.Timestamp`) AS proctime 
                 FROM `data.1` GROUP BY `Case.ID`')
 cases.1$amount[is.na(cases.1$amount)] = 0
@@ -41,9 +42,13 @@ cases.1$amount = as.numeric(cases.1$amount)
 cases.1$points = as.numeric(cases.1$points)
 cases.1$month = as.numeric(month(as.POSIXlt(cases.1$starttime, origin="1970-01-01", tz = "GMT")))
 cases.1$day = as.numeric(day(as.POSIXlt(cases.1$starttime, origin="1970-01-01", tz = "GMT")))
+cases.1$variant = minimizeOccurrence(cases.1$variant,20)
+cases.1$starttime = as.numeric(cases.1$starttime)
+cases.1$completion2 = as.numeric(sapply(cases.1$completiontimes, function(x) timePassedUntil(x,2)))
+cases.1$completion2 = cases.1$completion2 - cases.1$starttime
 #The relation that must be learned to predict the class of a case (Easy, Hard, ...)
 class.relation.1 = class ~ amount + article + points + vehicleclass + month + day
-proctime.relation.1 = proctime ~ amount + points + month + day
+proctime.relation.1 = proctime ~ amount + points + month + day + completion2
 
 ################################################################################
 #
@@ -163,7 +168,7 @@ proctime.relation.4 = proctime ~ leges + month + day + prefix
 compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
                  f.addclass.eh,
                  f.learnclass.dectree, 
-                 f.learnproctime.regressiontree, 
+                 f.learnproctime.regression, 
                  f.predictclass.dectree, 
                  f.predictproctime)
 
