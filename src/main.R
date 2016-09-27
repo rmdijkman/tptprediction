@@ -5,6 +5,7 @@ library(caret)
 library(dplyr)
 library(lubridate)
 library(fpc)
+library(e1071)
 
 source("src/utilfunctions.R")
 source("src/errorfunctions.R")
@@ -46,11 +47,13 @@ cases.1$month = as.numeric(month(as.POSIXlt(cases.1$starttime, origin="1970-01-0
 cases.1$day = as.numeric(day(as.POSIXlt(cases.1$starttime, origin="1970-01-01", tz = "GMT")))
 cases.1$variant = minimizeOccurrence(cases.1$variant,20)
 cases.1$starttime = as.numeric(cases.1$starttime)
-cases.1$completion2 = as.numeric(sapply(cases.1$completiontimes, function(x) timePassedUntil(x,2)))
+step = 3
+cases.1$isdone = (cases.1$nractivities <= step)
+cases.1$completion2 = as.numeric(sapply(cases.1$completiontimes, function(x) timePassedUntil(x,step)))
 cases.1$completion2 = cases.1$completion2 - cases.1$starttime
-#The relation that must be learned to predict the class of a case (Easy, Hard, ...)
+#cases.1 = cases.1[cases.1$isdone == FALSE,]
 class.relation.1 = class ~ amount + article + points + vehicleclass + month + day
-proctime.relation.1 = proctime ~ amount + points + month + day + completion2 + nractivities
+proctime.relation.1 = proctime ~ isdone + completion2
 
 ################################################################################
 #
@@ -78,7 +81,6 @@ cases.2$amount = as.numeric(cases.2$amount)
 cases.2$month = as.numeric(month(as.POSIXlt(cases.2$starttime, origin="1970-01-01", tz = "GMT")))
 cases.2$day = as.numeric(day(as.POSIXlt(cases.2$starttime, origin="1970-01-01", tz = "GMT")))
 cases.2$prefix = sapply(cases.2$activities, function(x) activityListPrefix(x,3))
-#The relation that must be learned to predict the class of a case (Easy, Hard, ...)
 class.relation.2 = class ~ amount + month + day + prefix
 proctime.relation.2 = proctime ~ amount + month + day + prefix
 
@@ -109,7 +111,6 @@ cases.3 <- sqldf('SELECT
                  FROM `data.3` GROUP BY `Case.ID`')
 cases.3$month = as.numeric(month(as.POSIXlt(cases.3$starttime, origin="1970-01-01", tz = "GMT")))
 cases.3$day = as.numeric(day(as.POSIXlt(cases.3$starttime, origin="1970-01-01", tz = "GMT")))
-#The relation that must be learned to predict the class of a case (Easy, Hard, ...)
 cases.3$prefix = sapply(cases.3$activities, function(x) activityListPrefix(x,1))
 class.relation.3 = class ~ impact + orgrole + month + day + prefix
 proctime.relation.3 = proctime ~ month + day + prefix
@@ -142,7 +143,6 @@ cases.4$leges = as.numeric(cases.4$leges)
 cases.4$month = as.numeric(month(as.POSIXlt(cases.4$starttime, origin="1970-01-01", tz = "GMT")))
 cases.4$day = as.numeric(day(as.POSIXlt(cases.4$starttime, origin="1970-01-01", tz = "GMT")))
 cases.4$prefix = sapply(cases.4$activities, function(x) activityListPrefix(x,1))
-#The relation that must be learned to predict the class of a case (Easy, Hard, ...)
 class.relation.4 = class ~ leges + responsible + month + day + prefix
 proctime.relation.4 = proctime ~ leges + month + day + prefix
 
@@ -152,25 +152,10 @@ proctime.relation.4 = proctime ~ leges + month + day + prefix
 #
 ################################################################################
 
-################################################################################
-#
-# Note: There currently is a line in predictionprocedure.R that only keeps
-#       the elements of the test set that also have a prefix that also occurs in
-#       the training set. That may be a problem.
-#
-################################################################################
-
-################################################################################
-#
-# TODO: 
-#   - Use a step number and time passed to predict processing time
-#
-################################################################################
-
 compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
                  f.addclass.noclass,
                  f.learnclass.noclass, 
-                 f.learnproctime.regression, 
+                 f.learnproctime.svm, 
                  f.predictclass.noclass, 
                  f.predictproctime)
 
