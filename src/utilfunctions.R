@@ -217,11 +217,24 @@ addProcTimes <- function(cases){
 # Pre: - the cases set has a column called 'prefix' that contains lists of activities
 #        separated by , (e.g. "A,B,C")
 #      - the log has a column called 'Activity' that contains activities that occur
-#      - the log has a column called 'proctimes' that contains the duration of activities
+#      - the cases set has a column called 'proctimes' that contains the duration of activities
+#      - the cases set has a column for each activity that has the activity name and indicates how often an activity occurs in the prefix
 #
 # returns the set of cases with a column added for each activity that contains
 #   for each case with a prefix, the average processing time of that activity
 # 
 #####################################################################################
 
-addActivityProcTimes <- \TODO
+addActivityProcTimes <- function(activitylog, cases){
+  activities <- unique(activitylog$Activity)
+  getProcTime <- function(activity, prefix, proctimes){
+    indices = which(strsplit(prefix,",")[[1]] %in% activity)
+    total = sum(as.numeric(strsplit(proctimes,",")[[1]][indices]))
+    return(total)
+  }
+  for (activity in activities){
+    cases[,paste("Time",activity)] = mapply(getProcTime, activity, cases$prefix, cases$proctimes)
+    cases[,paste("Time",activity)] = sapply(cases[,paste("Time",activity)] / cases[,as.character(activity)], function(x) if (is.na(x)) { 0 }else{ x })
+  }
+  return(cases)
+}
