@@ -57,3 +57,26 @@ minimizeOccurrence <- function(values, minimum){
   result[result %in% levels_with_toofew] = "toolow"
   return(result)
 }
+
+#####################################################################################
+#
+# Pre: - the cases set has a column called 'prefix' that contains lists of activities
+#        separated by , (e.g. "A,B,C")
+#      - the log has a column called 'Activity' that contains activities that occur
+#
+# To the set of cases, adds a column for each activity. For each pair row r, column
+# that corresponds to activity a, add a number that represents how often a appears 
+# r$prefix
+#
+# returns that set of cases
+# 
+#####################################################################################
+
+addActivityOccurrences <- function(activitylog, cases){
+  activities <- unique(activitylog$Activity)
+  for (activity in activities){
+    cases[[activity]] = as.numeric(sapply(cases$prefix, function(prefix) {activity %in% strsplit(prefix,",")[[1]]}))
+  }
+  return(cases)
+}
+
