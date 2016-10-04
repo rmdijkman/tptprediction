@@ -47,8 +47,8 @@ cases.1$month = as.numeric(month(as.POSIXlt(cases.1$starttime, origin="1970-01-0
 cases.1$day = as.numeric(day(as.POSIXlt(cases.1$starttime, origin="1970-01-01", tz = "GMT")))
 cases.1$variant = minimizeOccurrence(cases.1$variant,20)
 cases.1$starttime = as.numeric(cases.1$starttime)
-class.relation.1 = class ~ amount + article + points + vehicleclass + month + day
-proctime.relation.1 = proctime ~ amount + article + points + vehicleclass + month + day
+class.relation.1 = class ~ amount + article + points + month + day
+proctime.relation.1 = proctime ~ amount + article + points + month + day
 
 ################################################################################
 #
@@ -145,10 +145,10 @@ proctime.relation.4 = proctime ~ leges + month + day
 ################################################################################
 
 compute.proctime(cases.1, class.relation.1, proctime.relation.1, 
-                 f.addclass.noclass,
-                 f.learnclass.noclass, 
-                 f.learnproctime.svm, 
-                 f.predictclass.noclass, 
+                 f.addclass.clusters,
+                 f.learnclass.dectree, 
+                 f.learnproctime.regression, 
+                 f.predictclass.dectree, 
                  f.predictproctime)
 
 ################################################################################

@@ -1,3 +1,3 @@
 smape <- function(observationseries, predictedseries){
-  return(mean(200*abs(observationseries-predictedseries)/(observationseries+predictedseries)))
+  return(100*mean(abs(predictedseries-observationseries)/(abs(observationseries)+abs(predictedseries))))
 }
