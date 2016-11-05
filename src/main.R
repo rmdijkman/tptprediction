@@ -1,3 +1,4 @@
+#sqldf Metrics rpart caret dplyr lubridate fpc e1071
 library(sqldf)
 library(Metrics)
 library(rpart)
