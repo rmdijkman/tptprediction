@@ -1,10 +1,10 @@
 cases = cases.1
 class.relation = class.relation.1
 proctime.relation = proctime.relation.1
-f.addclass = f.addclass.noclass
-f.learnclass = f.learnclass.noclass
+f.addclass = f.addclass.eh
+f.learnclass = f.learnclass.dectree
 f.learnproctime = f.learnproctime.regression
-f.predictclass = f.predictclass.noclass
+f.predictclass = f.predictclass.dectree
 
 k = 10
 
@@ -28,7 +28,7 @@ cases.test.predictedclass = c()
 i = 1
   cases.train <- cases[-folds[[i]],]
   cases.test <- cases[folds[[i]],]
-
+  
   model.class = f.learnclass(cases.train, class.relation)
   modelvector.proctime = f.learnproctime(cases.train, proctime.relation)
   
@@ -66,7 +66,10 @@ for (class in classes){
 cat("Number of cases: ", as.numeric(count(cases)), "\n")
 cat("Average processing time (s): ", mean(cases$proctime), "\n")
 cat("Accuracy of class prediction: ", acc.avg, "\n")
-confusionMatrix(cases.test.predictedclass, cases.test.class)$table
+if (length(unique(cases.1$class)) > 1){
+  cat("Confusion matrix of class prediction:\n")
+  print(confusionMatrix(cases.test.predictedclass, cases.test.class)$table)
+}
 cat("MAE of processing time prediction (s): ", mae.avg, "\n")
 cat("MAE with 95% on time prediction (s): ", mae.avg.95, "\n")
 cat("MAE with 80% on time prediction (s): ", mae.avg.80, "\n")
